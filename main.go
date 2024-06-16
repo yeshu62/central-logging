@@ -8,32 +8,34 @@ import (
 	"math/rand"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 var logs = Logs{}
 
-func logHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
+func logHandler(c *gin.Context) {
+	switch c.Request.Method {
 	case "POST":
 		var log Log
-		if err := json.NewDecoder(r.Body).Decode(&log); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+		if err := c.ShouldBindJSON(&log); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 		id := logs.AddLog(log)
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]int64{"id": id})
+		c.JSON(http.StatusCreated, gin.H{"id": id})
 
 	case "GET":
 		var filter LogFilter
-		if serviceName := r.URL.Query().Get("serviceName"); serviceName != "" {
+		serviceName := c.Query("serviceName")
+		if serviceName != "" {
 			filter.ServiceName = serviceName
 		}
 		logs := logs.QueryLogs(filter)
-		json.NewEncoder(w).Encode(logs)
+		c.JSON(http.StatusOK, logs)
 
 	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "method not allowed"})
 	}
 }
 
@@ -52,15 +54,19 @@ func service(serviceName string, url string) {
 		if err != nil {
 			fmt.Println("Error logging", err)
 		}
-		time.Sleep(time.Second * time.Duration(rand.Intn(10)))
+		time.Sleep(time.Second)
 	}
 }
 
 func main() {
-	go service("Service1", "http://localhost:8080/logs")
-	go service("Service2", "http://localhost:8080/logs")
-	go service("Service3", "http://localhost:8080/logs")
+	r := gin.Default()
 
-	http.HandleFunc("/logs", logHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	r.POST("/logs", logHandler)
+	r.GET("/logs", logHandler)
+
+	go service("Service1", "http://localhost:8081/logs")
+	go service("Service2", "http://localhost:8081/logs")
+	go service("Service3", "http://localhost:8081/logs")
+
+	log.Fatal(r.Run(":8081"))
 }
