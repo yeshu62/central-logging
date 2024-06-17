@@ -10,4 +10,10 @@ A distributed logging system made using gin framework where multiple services ca
 - ```go mod init```
 - ```go mod tidy```
 - ```go run .```
+
+## Viewing the Logs:
+Navigate to http://localhost:8081/logs in your web browser to view the logs
+or
+```curl http://localhost:8081/logs```
+
   
