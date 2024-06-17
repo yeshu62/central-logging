@@ -28,6 +28,12 @@ func logHandler(c *gin.Context) {
 	case "GET":
 		var filter LogFilter
 		serviceName := c.Query("serviceName")
+		severity := c.Query("severity")
+
+		if severity != "" {
+			filter.Severity = severity
+		}
+
 		if serviceName != "" {
 			filter.ServiceName = serviceName
 		}

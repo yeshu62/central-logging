@@ -36,7 +36,7 @@ func (logs *Logs) AddLog(log Log) int64 {
 }
 
 func (f LogFilter) Matches(log Log) bool {
-	return (f.Timestamp.IsZero() || log.Timestamp.After(f.Timestamp)) && (f.Severity == "" || f.Severity == log.Severity) && (f.ServiceName == "" || f.ServiceName == log.ServiceName)
+	return (f.Timestamp.IsZero() || log.Timestamp.Before(f.Timestamp)) && (f.Severity == "" || f.Severity == log.Severity) && (f.ServiceName == "" || f.ServiceName == log.ServiceName)
 }
 
 func (logs *Logs) QueryLogs(filter LogFilter) []Log {
