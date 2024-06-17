@@ -40,7 +40,6 @@ func logHandler(c *gin.Context) {
 }
 
 func service(serviceName string, url string) {
-	fmt.Println("Post req from service: ", serviceName)
 
 	for {
 		log := Log{

@@ -28,10 +28,33 @@ func TellMe(s Speaker) {
 	fmt.Println(s.Speak())
 }
 
-func main() {
-	d := &Dog{"Rex"}
-	l := &Lion{"Leon"}
+func sum(num []int, res chan int) {
+	sum := 0
 
-	TellMe(d)
-	TellMe(l)
+	for _, num := range num {
+		sum += num
+	}
+
+	res <- sum
+}
+
+func main() {
+	// d := &Dog{"Rex"}
+	// l := &Lion{"Leon"}
+
+	// TellMe(d)
+	// TellMe(l)
+
+	numbers := []int{1, 2, 3, 4, 5, 6}
+
+	resultChan := make(chan int)
+
+	mid := len(numbers) / 2
+	go sum(numbers[:mid], resultChan)
+	go sum(numbers[mid:], resultChan)
+
+	sum1 := <-resultChan
+	sum2 := <-resultChan
+
+	fmt.Println(sum1 + sum2)
 }
