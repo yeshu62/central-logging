@@ -16,4 +16,6 @@ Navigate to http://localhost:8081/logs in your web browser to view the logs
 or
 ```curl http://localhost:8081/logs```
 
-  
+## Filtering the Logs:
+If you want to add filters for the logs, you can add it in the query parameters of the url:
+http://localhost:8081/logs?serviceName=service1&severity=ERROR
